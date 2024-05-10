@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin">
+	<select id="login" resultType="adminVo">
+		SELECT
+		NO,
+		PM_NO,
+		ID,
+		PWD,
+		NAME,
+		ENROLL_DATE,
+		QUIT_YN
+		FROM
+		ADMIN
+		WHERE ID = #{id}
+		AND PWD = #{pwd}
+		AND
+		QUIT_YN
+		= 'N'
+	</select>
+
+	<insert id="create">
+		INSERT
+		INTO
+		ADMIN
+		(
+		NO,
+		PM_NO,
+		ID,
+		PWD,
+		NAME,
+		ENROLL_DATE
+		)
+		VALUES
+		(
+		SEQ_ADMIN_NO.NEXTVAL,
+		#{pmNo},
+		#{id},
+		#{pwd},
+		#{name},
+		SYSDATE
+		)
+	</insert>
+
+	<update id="edit">
+		UPDATE ADMIN
+		SET
+		ID = #{id},
+		PWD = #{pwd}
+		WHERE
+		NO = #{no}
+	</update>
+
+	<select id="getAdmin" resultType="adminVo">
+		SELECT
+		NO,
+		PM_NO,
+		ID,
+		PWD,
+		NAME,
+		ENROLL_DATE,
+		QUIT_YN
+		FROM
+		ADMIN
+		WHERE NO = #{no}
+	</select>
+
+	<select id="checkId" resultType="int">
+		SELECT COUNT(*)
+		FROM ADMIN
+		WHERE
+		ID = #{id}
+	</select>
+
+	<select id="getAdminList" resultType="adminVo">
+		SELECT
+		NO,
+		PM_NO,
+		ID,
+		NAME,
+		ENROLL_DATE,
+		QUIT_YN
+		FROM ADMIN
+		WHERE
+		QUIT_YN = 'N'
+		AND PM_NO NOT IN ('4')
+		ORDER BY NO DESC
+	</select>
+
+	<select id="getMember" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE
+		QUIT_YN = 'N'
+	</select>
+	
+	<select id="getGroup" resultType="int">
+		SELECT COUNT(*)
+		FROM SMALL_GROUP
+		WHERE
+		DEL_YN = 'N'
+	</select>
+	
+	<select id="getSeminar" resultType="int">
+		SELECT COUNT(*)
+		FROM SEMINAR
+		WHERE
+		DEL_YN = 'N'
+	</select>
+	
+	<select id="getCnt" resultType="int">
+		SELECT COUNT(*)
+		FROM ADMIN
+		WHERE
+		QUIT_YN = 'N'
+	</select>
+
+	<update id="changeAuthor">
+		UPDATE ADMIN
+		SET
+		PM_NO = #{pmNo}
+		WHERE NO = #{no}
+	</update>
+
+	<update id="delete">
+		UPDATE ADMIN
+		SET
+		QUIT_YN = 'Y'
+		WHERE NO = #{no}
+	</update>
+</mapper>

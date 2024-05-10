@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="group">
+    <select id="list" parameterType="groupVo" resultType="groupVo">
+        SELECT
+            S.NO
+            ,S.L_NO
+            ,S.C_NO
+            ,S.NAME
+            ,S.INTRO
+            ,S.ENROLL_DATE
+            ,CONCAT('/app/resources/img/group/upload/', GP.CHANGE_NAME) THUMBNAIL_PATH
+            ,LC.NAME LOCAL_CATEGORY_NAME
+            ,GC.CATEGORY GROUP_CATEGORY_NAME
+        FROM
+            SMALL_GROUP S
+        LEFT JOIN
+            GROUP_PO GP
+        ON
+            S.NO = GP.G_NO
+        LEFT JOIN
+            LOCAL_CATEGORY LC
+        ON
+            S.L_NO = LC.NO
+        LEFT JOIN
+            GROUP_CATEGORY GC
+        ON
+            S.C_NO = GC.NO
+        WHERE
+            1=1
+        <if test="lNo != null">
+            AND S.L_NO = #{lNo}
+        </if>
+        <if test="cNo != null">
+            AND S.C_NO = #{cNo}
+        </if>
+        ORDER BY
+            S.NO DESC
+    </select>
+    <select id="total" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            SMALL_GROUP
+        WHERE
+            1=1
+        <if test="enrollDate != null">
+            AND ENROLL_DATE = #{enrollDate}
+        </if>
+        <if test="place != null">
+            AND PLACE = #{place}
+        </if>
+    </select>
+    <select id="categoryList" resultType="groupCategoryVo">
+       SELECT
+            NO
+            ,CATEGORY
+        FROM
+            GROUP_CATEGORY
+    </select>
+    <select id="localCategoryList" resultType="localCategoryVo">
+        SELECT
+            NO
+            ,NAME
+        FROM
+            LOCAL_CATEGORY
+    </select>
+    <select id="getGroupDetailImages" resultType="groupPoVo">
+       SELECT
+            NO
+            ,G_NO
+            ,ORIGIN_NAME
+            ,CHANGE_NAME
+        FROM
+            GROUP_PO
+        WHERE
+            G_NO = #{no}
+    </select>
+    <insert id="create" parameterType="groupVo">
+        INSERT INTO SMALL_GROUP (
+            NO
+            ,M_NO
+            ,C_NO
+            ,L_NO
+            ,NAME
+            ,INTRO
+            ,EXINTRO
+            ,PLACE
+            ,PEOPLENUM
+            ,STARTTIME
+            ,FINISHTIME
+            ,APPLYDATE
+            ,HIT
+            ,DEL_YN
+            ,REPORT_YN
+            ,BLOCK_YN
+            ,ENROLL_DATE
+        ) VALUES (
+            SMALL_GROUP_SEQ.NEXTVAL
+            ,#{mNo}
+            ,#{cNo}
+            ,#{lNo}
+            ,#{name}
+            ,#{intro}
+            ,#{exintro}
+            ,#{place}
+            ,#{peoplenum}
+            ,#{starttime}
+            ,#{finishtime}
+            ,#{applydate}
+            ,#{hit}
+            ,#{delYn}
+            ,#{reportYn}
+            ,#{blockYn}
+            ,TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+        )
+    </insert>
+    <insert id="saveThumbnail">
+        INSERT INTO GROUP_PO (
+            NO
+            ,G_NO
+            ,ORIGIN_NAME
+            ,CHANGE_NAME
+        ) VALUES (
+            GROUP_PO_SEQ.NEXTVAL
+            ,SMALL_GROUP_SEQ.CURRVAL
+            ,#{originName}
+            ,#{changeName}
+        )
+    </insert>
+    <insert id="saveGroupDetailImage">
+        INSERT INTO GROUP_PO2 (
+            NO
+            ,G_NO
+            ,ORIGIN_NAME
+            ,CHANGE_NAME
+        ) VALUES (
+            GROUP_PO2_SEQ.NEXTVAL
+            ,SMALL_GROUP_SEQ.CURRVAL
+            ,#{originName}
+            ,#{changeName}
+        )
+    </insert>
+    <update id="edit" parameterType="groupvo">
+        update SMALL_GROUP
+        set
+        C_NO = #{cNo},
+        L_NO = #{lNO},
+        NAME = #{name},
+        STARTTIME = #{starttime},
+        FINISHTIME = #{finishtime},
+        INTRO = #{intro},
+        EXINTRO = #{exintro},
+        WHERE
+        NO = #{no}
+    </update>
+    <select id="detail" resultType="groupVo">
+        SELECT
+            S.NO
+            ,S.L_NO
+            ,S.C_NO
+            ,S.NAME
+            ,S.INTRO
+            ,S.PEOPLENUM
+            ,S.STARTTIME
+            ,S.FINISHTIME
+            ,S.DEL_YN
+            ,S.EXINTRO
+            ,S.APPLYDATE
+            ,S.PLACE
+            ,CONCAT('/app/resources/img/group/upload/', GP.CHANGE_NAME) THUMBNAIL_PATH
+            ,LC.NAME LOCAL_CATEGORY_NAME
+            ,GC.CATEGORY GROUP_CATEGORY_NAME
+        FROM
+            SMALL_GROUP S
+        LEFT JOIN
+            GROUP_PO GP
+        ON
+            S.NO = GP.G_NO
+        LEFT JOIN
+            LOCAL_CATEGORY LC
+        ON
+            S.L_NO = LC.NO
+        LEFT JOIN
+            GROUP_CATEGORY GC
+        ON
+            S.C_NO = GC.NO
+        WHERE
+            S.NO = #{no}
+    </select>
+    <update id="hit" parameterType="int">
+        UPDATE BOARD
+        SET HIT = HIT+1
+        WHERE   NO = #{no}
+        AND     STATUS = 'O'
+    </update>
+    <delete id="delete">
+        UPDATE SMALL_GROUP
+        SET
+        STATUS = 'X'
+        , MODIFY_DATE = SYSDATE
+        WHERE   NO = #{no}
+        AND     M_NO = #{mNo}
+    </delete>
+    <select id="join" resultType="groupVo">
+        SELECT
+            G_NO,
+            M_NO,
+            NO,
+            NAME,
+            PEOPLENUM,
+            STARTTIME
+        FROM
+            SMALL_GROUP
+        WHERE
+            NO = #{no}
+    </select>
+    <select id="manage" resultType="groupVo">
+        SELECT
+            M_NO,
+            ENROLL_DATE,
+            APPLYDATE,
+            STARTTIME,
+            PHONE,
+            NAME
+        FROM
+            SMALL_GROUP
+        WHERE
+            NO = #{no}
+    </select>
+
+
+
+
+</mapper>
